@@ -150,7 +150,7 @@ $app->post('/login', function() use ($app) {
         $response['message'] = 'Login failed. Incorrect credentials';
     }
 
-    echoRespnse(200, $response);
+    echoResponse(200, $response);
 });
 
 /**
@@ -174,7 +174,7 @@ function authenticate(\Slim\Route $route) {
             // api key is not present in users table
             $response["error"] = true;
             $response["message"] = "Access Denied. Invalid Api key";
-            echoRespnse(401, $response);
+            echoResponse(401, $response);
             $app->stop();
         } else {
             global $user_id;
@@ -187,7 +187,7 @@ function authenticate(\Slim\Route $route) {
         // api key is missing in header
         $response["error"] = true;
         $response["message"] = "Api key is misssing";
-        echoRespnse(400, $response);
+        echoResponse(400, $response);
         $app->stop();
     }
 }
@@ -219,7 +219,7 @@ $app->post('/tasks', 'authenticate', function() use ($app) {
         $response["error"] = true;
         $response["message"] = "Failed to create task. Please try again";
     }
-    echoRespnse(201, $response);
+    echoResponse(201, $response);
 });
 
 /**
@@ -248,7 +248,7 @@ $app->get('/tasks', 'authenticate', function() {
         array_push($response["tasks"], $tmp);
     }
 
-    echoRespnse(200, $response);
+    echoResponse(200, $response);
 });
 
 /**
@@ -271,11 +271,11 @@ $app->get('/tasks/:id', 'authenticate', function($task_id) {
         $response["task"] = $result["task"];
         $response["status"] = $result["status"];
         $response["createdAt"] = $result["created_at"];
-        echoRespnse(200, $response);
+        echoResponse(200, $response);
     } else {
         $response["error"] = true;
         $response["message"] = "The requested resource doesn't exists";
-        echoRespnse(404, $response);
+        echoResponse(404, $response);
     }
 });
 
@@ -307,7 +307,7 @@ $app->put('/tasks/:id', 'authenticate', function($task_id) use($app) {
         $response["error"] = true;
         $response["message"] = "Task failed to update. Please try again!";
     }
-    echoRespnse(200, $response);
+    echoResponse(200, $response);
 });
 
 /**
@@ -330,7 +330,7 @@ $app->delete('/tasks/:id', 'authenticate', function($task_id) use($app) {
         $response["error"] = true;
         $response["message"] = "Task failed to delete. Please try again!";
     }
-    echoRespnse(200, $response);
+    echoResponse(200, $response);
 });
 
 $app->run();
