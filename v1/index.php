@@ -70,6 +70,10 @@ function echoResponse($status_code, $response) {
     // setting response content type to json
     $app->contentType('application/json');
 
+    foreach ($response as &$r) {
+        $r = utf8_encode($r);
+    }
+    
     echo json_encode($response);
 }
 
@@ -86,9 +90,9 @@ $app->post('/register', function() use ($app) {
     $response = array();
 
     // reading post params
-    $name = $app->request->post('name');
-    $email = $app->request->post('email');
-    $password = $app->request->post('password');
+    $name = utf8_decode($app->request->post('name'));
+    $email = utf8_decode($app->request->post('email'));
+    $password = utf8_decode($app->request->post('password'));
 
     // validating email address
     validateEmail($email);
@@ -203,7 +207,7 @@ $app->post('/tasks', 'authenticate', function() use ($app) {
     verifyRequiredParams(array('task'));
 
     $response = array();
-    $task = $app->request->post('task');
+    $task = utf8_decode($app->request->post('task'));
 
     global $user_id;
     $db = new DbHandler();
@@ -290,7 +294,7 @@ $app->put('/tasks/:id', 'authenticate', function($task_id) use($app) {
     verifyRequiredParams(array('task', 'status'));
 
     global $user_id;
-    $task = $app->request->put('task');
+    $task = utf8_decode($app->request->put('task'));
     $status = $app->request->put('status');
 
     $db = new DbHandler();
