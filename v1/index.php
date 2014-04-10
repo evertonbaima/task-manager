@@ -1,5 +1,7 @@
 <?php
 
+header('Access-Control-Allow-Origin: *');
+
 require_once '.././libs/ChromePhp.php';
 require_once '../include/DbHandler.php';
 require_once '../include/PassHash.php';
