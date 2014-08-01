@@ -1,6 +1,8 @@
 <?php
 
 header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
+header('Access-Control-Allow-Headers: Authorization');
 
 require_once '.././libs/ChromePhp.php';
 require_once '../include/DbHandler.php';
@@ -20,7 +22,6 @@ $user_id = NULL;
 function verifyRequiredParams($required_fields) {
     $error = false;
     $error_fields = "";
-    $request_params = array();
     $request_params = $_REQUEST;
     // Handling PUT request params
     if ($_SERVER['REQUEST_METHOD'] == 'PUT') {
@@ -60,6 +61,15 @@ function validateEmail($email) {
 }
 
 /**
+ * UTF8 encode an item for array_walk_recursive function.
+ * @param String $item String to be encoded
+ * @param int $key the item index in array
+ */
+function utf8(&$item, $key) {
+    $item = utf8_encode($item);
+}
+
+/**
  * Echoing json response to client
  * @param String $status_code Http response code
  * @param Int $response Json response
@@ -72,10 +82,8 @@ function echoResponse($status_code, $response) {
     // setting response content type to json
     $app->contentType('application/json');
 
-    foreach ($response as &$r) {
-        $r = utf8_encode($r);
-    }
-    
+    array_walk_recursive($response, 'utf8');
+
     echo json_encode($response);
 }
 
@@ -186,8 +194,9 @@ function authenticate(\Slim\Route $route) {
             global $user_id;
             // get user primary key id
             $user = $db->getUserId($api_key);
-            if ($user != NULL)
+            if ($user != NULL) {
                 $user_id = $user["id"];
+            }
         }
     } else {
         // api key is missing in header
@@ -197,6 +206,17 @@ function authenticate(\Slim\Route $route) {
         $app->stop();
     }
 }
+
+/**
+ * Tell the client that the access is free.
+ * method OPTIONS
+ * url - /tasks(/:id)
+ */
+$app->options('/tasks(/:id)', function($id = NULL) {
+    $response["error"] = false;
+    $response["message"] = "Free Access.";
+    echoResponse(200, $response);
+});
 
 /**
  * Creating new task in db
